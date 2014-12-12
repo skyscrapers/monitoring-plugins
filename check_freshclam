@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+require 'date'
+
+state = {
+    :ok       => 0,
+    :warning  => 1,
+    :critical => 2,
+    :unknown  => 3
+}
+
+
+out = `/usr/bin/freshclam -V`
+now = DateTime.now
+
+signature_date = DateTime.parse(out.split('/').last)
+signature_age  = (DateTime.now - signature_date).to_f
+
+if signature_age < 2.5
+    puts "Signatures up-to-date (#{signature_date})."
+    exit state[:ok]
+elsif (2.5..5).include? signature_age
+    puts "Signatures are #{signature_age.to_i} days old."
+    exit state[:warning]
+elsif (5..14).include? signature_age
+    puts "ATTENTION! Signatures are #{signature_age.to_i} days old!"
+    exit state[:critical]
+else
+    puts "ARE YOU INSANE!? Y U NO UPDATE YOUR SIGNATURES?"
+    exit state[:critical]
+end
+
+exit state[:unknown]

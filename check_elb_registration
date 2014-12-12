@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# written by filip@skyscrape.rs
+# 2014-01-28
+
+# checks if this machine is registered and InService with the given ELB
+
+HOME="/var/lib/nagios"
+
+if [ $# -eq "1" ]; then
+
+	INSTANCEID=`/usr/bin/ec2metadata --instance-id`
+
+	RESULT=`/usr/local/bin/aws --profile nagiosro elb describe-instance-health --load-balancer-name $1 --instances $INSTANCEID`
+
+	echo $RESULT | grep -q "\"State\": \"InService\""
+	if [ $? -eq 0 ]; then
+		echo "OK - $INSTANCEID is InService with ELB $1"
+		exit 0
+	fi
+
+	echo $RESULT | grep -q "\"State\": \"OutOfService\""
+	if [ $? -eq 0 ]; then
+	        echo "CRITICAL - $INSTANCEID is OutOfService with ELB $1"
+        	exit 2
+	fi
+
+	echo "CRITICAL - something is FUBAR with $INSTANCEID and ELB $1"
+	exit 2
+
+else
+        echo "USAGE: $0 <ELB Name>"
+        exit 1
+fi

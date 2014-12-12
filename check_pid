@@ -1,0 +1,21 @@
+#!/bin/bash
+
+for FILE in /var/run/*.pid
+do
+        PID=`cat $FILE`;
+        RUNNING=`ps aux|grep $PID|grep -v grep|wc -l`;
+        if [ $RUNNING -lt 1 ]
+        then
+                if [ $FILE != '/var/run/sm-notify.pid' ]
+                then
+                	if [ $FILE != '/var/run/proftpd.pid']
+	                then
+        	                echo -e "WARNING - $FILE has no associated process\0"
+                	        exit 1
+	                fi
+		fi
+        fi
+done
+
+echo -e "OK - All PID files seem to have an associated process\0"
+exit 0

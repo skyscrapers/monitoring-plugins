@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#
+# Written by Filip Van Tittelboom (filip@ilibris.be)
+# Script that executes CmdTool2 to check RAID consistency
+#
+# CONFIG
+CMDTOOL2='/opt/MegaRAID/CmdTool2/CmdTool2'
+
+# VARS
+DISKS=`$CMDTOOL2 -AdpAllInfo -aALL | /bin/grep -A 8 'Device Present' | /bin/grep 'Disks      ' | /usr/bin/cut -c21-`
+DEGRADED=`$CMDTOOL2 -AdpAllInfo -aALL | /bin/grep -A 8 'Device Present' | /bin/grep 'Degraded' | /usr/bin/cut -c21-`
+OFFLINE=`$CMDTOOL2 -AdpAllInfo -aALL | /bin/grep -A 8 'Device Present' | /bin/grep 'Offline' | /usr/bin/cut -c21-`
+CRITICAL=`$CMDTOOL2 -AdpAllInfo -aALL | /bin/grep -A 8 'Device Present' | /bin/grep 'Critical Disks' | /usr/bin/cut -c21-`
+FAILED=`$CMDTOOL2 -AdpAllInfo -aALL | /bin/grep -A 8 'Device Present' | /bin/grep 'Failed Disks' | /usr/bin/cut -c21-`
+
+# SCRIPT
+
+$CMDTOOL2 -AdpAllInfo -aALL | /bin/grep -q -A 8 'Device Present'
+
+if [ $? -eq 0 ]; then
+	if [[ $DEGRADED -eq 0 ]] && [[ $OFFLINE -eq 0 ]] && [[ $CRITICAL -eq 0 ]] && [[ $FAILED -eq 0 ]]; then
+		echo -n "OK - Disks: ${DISKS/ /} Degraded: ${DEGRADED/ /} Offline: ${OFFLINE/ /} Critical: ${CRITICAL/ /} Failed: ${FAILED/ /}"
+		rm /MegaSAS.log
+		exit 0
+	else
+		echo -n "CRITICAL - Disks: ${DISKS/ /} Degraded: ${DEGRADED/ /} Offline: ${OFFLINE/ /} Critical: ${CRITICAL/ /} Failed: ${FAILED/ /}"
+		rm /MegaSAS.log
+		exit 2
+	fi
+else
+	echo -n "CRITICAL - no privileges to run CmdTool2"
+	exit 2
+fi

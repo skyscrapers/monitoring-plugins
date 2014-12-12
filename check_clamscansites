@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#Check whether the log file exists and changed in the last 32h
+FILE=`find /var/log/clamav -mtime -1920 -iwholename '*/clamscansites.log' -print`
+
+if [ -z $FILE ]; then
+        echo -n "WARNING - No virus scan taken yet, or older than 1d"
+        exit 1
+else
+	#logfile exists and is recent enough"
+	CONTENT=`cat $FILE`
+
+	if [ `cat $FILE | wc -l` -lt 1 ]; then
+                echo -n "WARNING - Logfile empty"
+                exit 1
+	elif [ `cat $FILE | grep 'Infected files: 0' |wc -l` -lt 1 ]; then
+                echo -n "CRITICAL - Infected files found: $CONTENT"
+                exit 2
+	else
+                echo -n "OK - No infected files found: $CONTENT"
+                exit 0
+	fi
+fi

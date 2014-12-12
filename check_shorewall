@@ -1,0 +1,11 @@
+#!/bin/bash
+
+/bin/cat /etc/default/shorewall | grep -q startup=1
+
+if [ $? -eq 0 ]; then
+	echo -n "OK - Shorewall is configured to run"
+	exit 0
+else
+	echo -n "CRITICAL - Shorewall is not configured to run. Edit /etc/default/shorewall to fix the problem."
+	exit 2
+fi

@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+
+##    This program is free software: you can redistribute it and/or modify
+##    it under the terms of the GNU General Public License as published by
+##    the Free Software Foundation, either version 3 of the License, or
+##    (at your option) any later version.
+##
+##    This program is distributed in the hope that it will be useful,
+##    but WITHOUT ANY WARRANTY; without even the implied warranty of
+##    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##    GNU General Public License for more details.
+##
+
+# ===============
+# check_postfixbounced - plugin to check the number of mail bounced by parsing logfiles
+# ===============
+# * based on mail processor; adapted by Dave Derycker to check for bounces and errors
+# * mail processor written by Cecil Westerhof & Modifications for nagios by Frank IJskes
+
+
+# version 1.0 (14.Nov.2011)
+# plugin return codes:
+# 0     OK
+# 1     Warning
+# 2     Critical
+# 3     Unknown
+
+while getopts "hvw:c:" opt
+do
+        case $opt in
+                h)
+                        showhelp=1
+                        break
+                ;;
+                w)
+                        warning="$OPTARG"
+                ;;
+                c)
+                        critical="$OPTARG"
+                ;;
+                v)
+                        verbose=1
+                ;;
+        esac
+done
+
+
+declare -r NO_OF_SECONDS=3000
+declare -r UNTIL_TIME=$(date +%s)
+
+declare -i numberOfMails=0
+
+postfixlog="/var/log/mail.log"
+postfixerrorlog="/var/log/mail.err"
+if [ ! "$postfixlog" ]; then
+        echo "Could not find postfix log!"
+        exit 3
+fi
+if [ ! "$postfixerrorlog" ]; then
+        echo "Could not find postfix error log!"
+        exit 3
+fi
+
+printUsage() {
+        echo "Usage: $0 [-h] [-v] -w <warning> -c <critical> "
+        echo ""
+        echo "Example: $0 -w 50 -c 100 "
+}
+
+printHelp() {
+        printUsage
+        echo ""
+        echo "This plugin checks the number of messages bounced, and other errors generated, by Postfix in the last $NO_OF_SECONDS seconds."
+        echo ""
+        echo "For more details, see inside the script ;)"
+        echo ""
+        exit 3
+}
+
+
+IFS='
+'
+
+getnrMesgs () {
+	for dateTime in $(grep ' postfix/smtp\[.*, status=bounced ' ${postfixlog} | \
+	    awk '{ print $1, $2, $3; }') ; do
+	       if [[ $((${UNTIL_TIME} - $(date --date="${dateTime}" +%s))) -lt ${NO_OF_SECONDS} ]] ; then
+	          numberOfMails+=1
+	       fi
+	    done
+	for dateTime in $(grep 'postfix' ${postfixerrorlog} | \
+	    awk '{ print $1, $2, $3; }') ; do
+	       if [[ $((${UNTIL_TIME} - $(date --date="${dateTime}" +%s))) -lt ${NO_OF_SECONDS} ]] ; then
+	          numberOfMails+=1
+	       fi
+	    done
+	
+	echo ${numberOfMails} 
+}
+
+if [ "$showhelp" = "1" ]; then
+        printHelp
+        exit 3
+fi
+
+if [ ! "$warning" ] || [ ! "$critical" ]; then
+        printUsage
+        exit 3
+fi
+
+if [ $warning -ge $critical ]; then
+        echo "<warning> has to be smaller than <critical>!"
+        exit 3
+fi
+
+nrmsgs=`getnrMesgs`
+
+echo "Messages bounced or errored in the last $NO_OF_SECONDS seconds: $nrmsgs | problems=$nrmsgs"
+
+if [ "$nrmsgs" -ge "$critical" ]; then
+        exit 2
+elif [ "$nrmsgs" -ge "$warning" ]; then
+        exit 1
+else
+        exit 0
+fi
+

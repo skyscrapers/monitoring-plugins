@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Written by filip@ilibris.be
+# 2011-05-04
+#
+# Nagios plugin that checks if a certain mount is really mounted and writable
+
+#Bugfix: for some reason "cat /dev/urandom" takes ages on a precise machine, so limit the working set asap
+#STRING=`cat /dev/urandom| tr -dc 'a-zA-Z' | fold -w 25 | head -n1`
+STRING=`head -n8 /dev/urandom| tr -dc 'a-zA-Z' | fold -w 25 | head -n1`
+
+if [ $# -eq "2" ]; then
+
+        CHECK=`cat /proc/mounts | grep $1`
+        MOUNTPOINT=`echo $CHECK | cut -d' ' -f2`
+        MOUNTTYPE=`echo $CHECK | cut -d' ' -f3`
+
+        if [ "$MOUNTPOINT" == "$1" ]; then
+
+		if [ "$2" == "all" ]; then
+			echo -e "OK - $1 is mounted with type $MOUNTTYPE"
+			exit 0
+                elif [ "$MOUNTTYPE" == "$2" ]; then
+                       cd $1 && touch $STRING
+                        if [ $? -eq 0 ]; then
+                                echo -e "OK - $1 is mounted with type $MOUNTTYPE and is writable"
+                                rm $STRING
+                                exit 0
+                        else
+                                echo -e "WARNING - $1 is mounted with type $MOUNTTYPE but is not writable"
+                                exit 1
+                        fi
+                else
+                        echo -e "WARNING - $1 is mounted but with incorrect type ($MOUNTTYPE)"
+                        exit 1
+                fi
+
+        else
+                echo -e "CRITICAL - $1 isn't mounted"
+                # try to mount as silent as possible
+                mount $1 2> /dev/null
+                exit 2
+        fi
+
+else
+        echo "USAGE: $0 <mount point> <fstype>"
+	echo "Use <fstype> 'all' if the type doesn't matter - not checked if writable"
+        exit 1
+fi

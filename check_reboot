@@ -1,0 +1,13 @@
+#!/bin/bash
+# Nagios script that checks if a Debian/Ubuntu system needs a reboot
+# Written by Filip Van Tittelboom (filip@ilibris.be)
+#
+REBOOTFILE="/var/run/reboot-required"
+
+if [ -f $REBOOTFILE ]; then
+        echo -n "WARNING - reboot required"
+        exit 1
+else
+        echo -n "OK - no reboot required"
+        exit 0
+fi

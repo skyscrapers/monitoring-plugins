@@ -1,0 +1,48 @@
+#!/bin/sh
+# ABOUT
+#
+# Small script to check if there is a Puppet pid file and if Puppet did an update recently
+# Written by Filip Van Tittelboom (filip@ilibris.be)
+#
+# CONFIG
+#
+PATH_CLIENTPID=/var/run/puppet/agent.pid
+PATH_MASTERPID=/var/run/puppet/master.pid
+PATH_STATE=/var/lib/puppet/state/state.yaml
+WARNING=7200
+CRITICAL=10800
+
+if [ ! -e $1 ]; then
+        if [ $1 = "server" ]; then
+                PATH_PID=$PATH_MASTERPID
+                NAME_DAEMON="puppet master"
+        else
+                PATH_PID=$PATH_CLIENTPID
+                NAME_DAEMON="puppet agent"
+        fi
+
+        # maybe not daemonized but run as cron?
+        grep -q "START=no" /etc/default/puppet
+        if [ $? -eq 0 ] || [ -f $PATH_PID ]; then
+                NOW=$(date +%s)
+                FILEMODIF=$(stat -c %Y $PATH_STATE)
+                let TESTTIMEW=$FILEMODIF+$WARNING
+                let TESTTIMEC=$FILEMODIF+$CRITICAL
+
+                if [ $NOW -gt $TESTTIMEC ]; then
+                        echo -e "CRITICAL - It has been more than $((($NOW-$FILEMODIF)/60)) min since $NAME_DAEMON did an update\0"
+                        exit 2
+                elif [ $NOW -gt $TESTTIMEW ]; then
+                        echo -e "WARNING - It has been more than $((($NOW-$FILEMODIF)/60)) min since $NAME_DAEMON did an update\0"
+                        exit 1
+                else
+                        echo -e "OK - $NAME_DAEMON is running and updating\0"
+                        exit 0
+                fi
+        else
+                echo -e "CRITICAL - $NAME_DAEMON is not running\0"
+                exit 2
+        fi
+else
+        echo "Usage: $0 [client|server]"
+fi

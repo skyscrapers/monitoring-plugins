@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Written by filip@ilibris.be
+# 2011-09-07
+
+# Config
+
+CHECKFILE=/usr/local/bacula/var/bacula/lastrun
+#TESTTIME=90000 #25h
+TESTTIME=115200 #32h
+
+# Script
+
+NOW=`/bin/date +%s`
+MODTIME=`/usr/bin/stat -c %Y $CHECKFILE`
+TCRITICAL=$(($MODTIME + $TESTTIME))
+
+if [ -e "$CHECKFILE" ]; then
+
+        if [ $NOW -lt $TCRITICAL ]; then
+                echo -n "OK - Recent Bacula backup taken (< $(($TESTTIME / 60 / 60))h old)"
+                exit 0
+        else
+                echo -n "WARNING - Last Bacula backup is more than $(($TESTTIME / 60 / 60))h old"
+                exit 1
+        fi
+
+else
+
+        echo -n "CRITICAL - It seems no backup has yet been taken. Check Bacula server config"
+        exit 2
+
+fi
