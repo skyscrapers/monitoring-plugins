@@ -16,7 +16,7 @@
 # ===============
 # * based on mail processor; adapted by Dave Derycker to check for bounces and errors
 # * mail processor written by Cecil Westerhof & Modifications for nagios by Frank IJskes
-
+# * In the beginning of January there can be a problem when the log is not rotated yet. eg 28-12-14 is seen as 28-12-15
 
 # version 1.0 (14.Nov.2011)
 # plugin return codes:
