@@ -5,12 +5,14 @@ Monitoring (Nagios) plugins that Skyscrapers uses.
 
 ## Requirements
 
+- Ruby + Ruby-dev
 - FPM
 - Ruby (for FPM)
 
 ## Usage
 
 ```
+apt-get install ruby-dev
 gem install fpm
 ./build.sh
 ```
