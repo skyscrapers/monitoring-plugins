@@ -55,7 +55,7 @@
 use strict;
 use Time::Local;
 use Getopt::Long;
-use lib "/usr/lib64/nagios/plugins";
+use lib "/usr/lib/nagios/plugins";
 use utils qw(%ERRORS &print_revision &support &usage);
 
 my $PROGNAME="check_ssl_certificates";
