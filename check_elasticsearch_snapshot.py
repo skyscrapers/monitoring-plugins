@@ -51,10 +51,10 @@ def main(argv):
 
 def get_snapshots(name):
     try:
-        r = requests.get("http://localhost:9200/_snapshot/" + name + "/_all")
+        r = requests.get("http://localhost:9200/_snapshot/" + name + "/_all", timeout=10)
     except requests.Timeout, e:
         print 'Time-out when querying for snapshots'
-        exit(3)
+        exit(0)
     if r.status_code != 200:
         print 'HTTP response is not 200 when requesting snapshots'
         try:
@@ -81,10 +81,10 @@ def match_backup(name, age):
 
 def output(matched, age):
     if matched:
-        print 'Backup is not older then ' + age + ' hours.'
+        print 'Backup is not older then ' + str(age) + ' hours.'
         exit(0)
     else:
-        print 'Backup is older then ' + age + ' hours.'
+        print 'Backup is older then ' + str(age) + ' hours.'
         exit(2)
 
 if __name__ == "__main__":
