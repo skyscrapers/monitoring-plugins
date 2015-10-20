@@ -27,6 +27,7 @@ gem install fpm
 - check_couchdb
 - check_dir
 - check_elasticsearch
+- check_elasticsearch_snapshot.py
 - check_elb.py
 - check_elb_registration
 - check_file_ages_in_dirs
@@ -49,3 +50,4 @@ gem install fpm
 - check_ssl_certificate
 - check_succes_bacula
 - check_supervisorctl.sh
+- check_users.py
