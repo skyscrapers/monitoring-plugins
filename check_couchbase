@@ -137,14 +137,14 @@ def check_status(hostname, port, user, passwd, warning, critical):
 
     # get balance status
     try:
-        balance_status = j['balanced']
+        balance_status = j['rebalanceStatus']
     except Exception:
         print("UNKNOWN - got malformed json from server")
         sys.exit(nagios_codes['UNKNOWN'])
 
     # We now have all needed data. Do the checking.
 
-    if balance_status == True:
+    if balance_status == "none":
         if mem_percentage >= critical or hdd_percentage >= critical:
             print("CRITICAL - balanced, %0.2f%% mem free, %0.2f%% disk free"%(100.00 - mem_percentage, 100.00 - hdd_percentage))
             sys.exit(nagios_codes['CRITICAL'])
