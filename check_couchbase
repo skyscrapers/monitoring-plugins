@@ -168,7 +168,7 @@ def check_status(hostname, port, user, passwd, warning, critical):
 """
 def check_buckets(hostname, port, user, passwd, warning, critical):
 
-    buckets_url = "http://" + hostname + ":" + port + "/pools/nodes/buckets"
+    buckets_url = "http://" + hostname + ":" + port + "/pools/default/buckets"
 
     # get all buckets stats
     buckets_stats = get_all_buckets_stats(buckets_url, user, passwd)
