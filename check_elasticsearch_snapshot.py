@@ -81,10 +81,10 @@ def match_backup(name, age):
 
 def output(matched, age):
     if matched:
-        print 'Backup is not older then ' + str(age) + ' hours.'
+        print 'Backup is not older than ' + str(age) + ' hours.'
         exit(0)
     else:
-        print 'Backup is older then ' + str(age) + ' hours.'
+        print 'Backup is older than ' + str(age) + ' hours.'
         exit(2)
 
 if __name__ == "__main__":
