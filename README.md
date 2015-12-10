@@ -25,6 +25,8 @@ gem install fpm
 - check_clamscansites
 - check_cloudwatch.py
 - check_couchdb
+- check_couchbase.py
+- check_couchbase_buckets.py (https://github.com/ebruAkagunduz/nagios-plugin-couchbase)
 - check_dir
 - check_elasticsearch
 - check_elasticsearch_snapshot.py
@@ -34,6 +36,7 @@ gem install fpm
 - check_file_content.pl
 - check_freshclam
 - check_md_raid
+- check_memory (https://exchange.icinga.org/exchange/check_linux_memory)
 - check_mount
 - check_nginx
 - check_phy_raid
