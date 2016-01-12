@@ -24,6 +24,15 @@ gem install fpm
 ./build-docker.sh
 ```
 
+### Test framework
+
+For new developments tox/nosetests is setup. Test can be added to /test folder
+
+Run the test
+```
+./build-test-docker.sh
+```
+
 
 ## Plugins
 
