@@ -9,6 +9,8 @@ Monitoring (Nagios) plugins that Skyscrapers uses.
 - FPM
 - Ruby (for FPM)
 
+In case of docker run it is only needed Docker.
+
 ## Usage
 
 ```
@@ -16,6 +18,12 @@ apt-get install ruby-dev
 gem install fpm
 ./build.sh
 ```
+### Usage with docker
+
+```
+./build-docker.sh
+```
+
 
 ## Plugins
 
