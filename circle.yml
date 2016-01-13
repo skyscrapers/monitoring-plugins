@@ -3,5 +3,5 @@ machine:
     - docker
 test:
     override:
-        - sh build-docker.sh
         - sh build-test-docker.sh
+        - sh build-docker.sh
