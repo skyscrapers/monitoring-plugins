@@ -16,5 +16,5 @@ def run(command):
     return check_call(command, shell=True)
 
 
-run('nosetests  --cover-package skymonitoringplugins '
+run('nosetests '
     '--with-xunit --cover-xml -v unit/ ')

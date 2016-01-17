@@ -5,8 +5,7 @@ import boto3
 # import types
 # import logging
 
-from skymonitoringplugins import check_cloudwatch_alarms
-# from awscli.testutils import mock
+import check_cloudwatch_alarms	
 
 class TestCheckCloudWatchAlarms(BaseTestCase):
 
@@ -14,16 +13,7 @@ class TestCheckCloudWatchAlarms(BaseTestCase):
     WARNING=1
     CRITICAL=2
     UNKNOWN=3
-#    def filter_1(StateValue):
-#        name = 'name'
-#        filterResult = []
-#        filterResult.append({name: "testName", "city": "San Francisco"})
-#        return filterResult
- 
-#    def test_tmp1(self):
-#        def test_func(): print 'wow'
-#        dynf = types.FunctionType(test_func.func_code, {})
-#        dynf()
+
     class Object(object):
         pass
     

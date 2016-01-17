@@ -28,11 +28,10 @@ if sys.version_info[0] == 2:
 
 setup(
     name='skymonitoringplugins',
-    version="1.0.0",
+    version="1.3.1",
     description='Skyscrapers monitoring tools',
     author='skyscrapers',
     scripts=[],
-    packages=find_packages(exclude=['tests*']),
     include_package_data=True,
     install_requires=requires,
 )
