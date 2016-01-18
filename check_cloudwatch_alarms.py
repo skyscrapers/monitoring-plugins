@@ -15,6 +15,10 @@ import argparse
 import os
 from wsgiref.validate import check_status
 import code
+import re
+import logging
+
+################################################################
 client = None
 
 OK=0
@@ -36,6 +40,9 @@ def main(argv):
                        type=bool, default=False,
                        help='Setting to true CRITICAL state would be never returned')
     
+    parser.add_argument('--alarmfilterexpression',dest='alarmFilterExpression', 
+                        help='Expression for filter the alarms (python syntax)')
+
     parser.add_argument('--AWS_DEFAULT_REGION',dest='AWS_DEFAULT_REGION', 
                         help='AWS parameter: AWS_DEFAULT_REGION')
     parser.add_argument('--AWS_ACCESS_KEY_ID',dest='AWS_ACCESS_KEY_ID', 
@@ -45,13 +52,14 @@ def main(argv):
 
     args = parser.parse_args()
     set_aws_params(args)
-    code = do_checks(args.statevalue, args.alarmNames)
+    code = do_checks(args.statevalue, args.alarmNames, args.alarmFilterExpression)
     exit(code)
 
-def do_checks(statevalue, alarmNames):
+def do_checks(statevalue, alarmNames, alarmFilterExpression):
     print alarmNames
     client = get_client()    
     alarms = get_alarms(client, statevalue, alarmNames)
+    alarms = filter_alarms(alarms, alarmFilterExpression)
     code = check_status(alarms, statevalue)
     return code
     
@@ -75,7 +83,20 @@ def get_alarms(client, stateValue, alarmNames):
                                       StateValue=stateValue,
             )
     return alarms
-
+    
+def filter_alarms(alarms, alarmFilterExpression=None):
+    if alarmFilterExpression is None:
+		return alarms
+    else:
+	alarmsFiltered = []
+        for alarm in alarms:
+            print (alarm.name)
+            r = re.compile(alarmFilterExpression, flags=re.I | re.X)
+            match = r.match(alarm.name)
+            print match
+            if match:                      
+                alarmsFiltered.append(alarm)
+        return alarmsFiltered
 
 def check_status(alarms, stateValue, nonCritical=False):
     output = ''
@@ -101,7 +122,7 @@ def check_status(alarms, stateValue, nonCritical=False):
             else:
                 output += "WARNING - " + alarm.state_value + " - in cloudwatch\n"
                 code = UNKNOWN
-            output += "  alarm.name=" + alarm.name + "\n"
+            output += "  alarm.namealarm.name=" + alarm.name + "\n"
             output += "  alarm.alarm_description=" + str(alarm.alarm_description) + "\n"
             output += "  alarm.state_value=" + str(alarm.state_value) + "\n"
             output += "  alarm.state_reason=" + str(alarm.state_reason) + "\n"
@@ -121,7 +142,7 @@ def check_status(alarms, stateValue, nonCritical=False):
             output += "  alarm.period=" + str(alarm.period) + "\n"
             output += "  alarm.statistic=" + str(alarm.statistic) + "\n"
             output += "  alarm.threshold=" + str(alarm.threshold) + "\n"
-            output += "  alarm.unit=" + str(alarm.unit) + "\n"
+            output += "  alarm.namealarm.unit=" + str(alarm.unit) + "\n"
             countAlarms += 1
         if countAlarms > 0:
             print ("Found " + str(countAlarms) + " alarms found for State - " +stateValue + " - in cloudwatch\n")
