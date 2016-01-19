@@ -1,4 +1,3 @@
-/skyscrapers-monitoring-plugins_1.3.0_all.deb
 /.project
 /.tox/
 /dist/
@@ -7,7 +6,8 @@
 /.pydevproject
 /sky_monitoring_plugins.egg-info/
 /skymonitoringplugins.egg-info/
-/skyscrapers-monitoring-plugins_1.3.0_all/
+/skyscrapers-monitoring-plugins_*_all/
 *.[pP][yY][cC]
 /build/
 *.[pP][yY][~]
+/skyscrapers-monitoring-plugins_*_all.deb
