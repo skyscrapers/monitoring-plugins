@@ -122,7 +122,7 @@ def check_status(alarms, stateValue, nonCritical=False):
             else:
                 output += "WARNING - " + alarm.state_value + " - in cloudwatch\n"
                 code = UNKNOWN
-            output += "  alarm.namealarm.name=" + alarm.name + "\n"
+            output += "  alarm.name=" + alarm.name + "\n"
             output += "  alarm.alarm_description=" + str(alarm.alarm_description) + "\n"
             output += "  alarm.state_value=" + str(alarm.state_value) + "\n"
             output += "  alarm.state_reason=" + str(alarm.state_reason) + "\n"
