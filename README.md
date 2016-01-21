@@ -71,3 +71,4 @@ Run the test
 - check_succes_bacula
 - check_supervisorctl.sh
 - check_users.py
+- check_glusterfs (https://exchange.nagios.org/directory/Plugins/System-Metrics/File-System/GlusterFS-checks/details)
