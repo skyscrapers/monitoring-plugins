@@ -1,9 +1,10 @@
 from tests import mock, BaseTestCase
 # from mock import Mock 
 import boto3
+import base64
 # import placebo
 # import types
-# import logging
+import logging
 
 import check_cloudwatch_alarms	
 
@@ -13,8 +14,6 @@ class TestCheckCloudWatchAlarms(BaseTestCase):
     WARNING=1
     CRITICAL=2
     UNKNOWN=3
-
-
 
     def test_filter_alarms(self):
         class MockAlarm:
@@ -41,5 +40,18 @@ class TestCheckCloudWatchAlarms(BaseTestCase):
         self.assertEquals(check_cloudwatch_alarms.WARNING, check_cloudwatch_alarms.check_status(alarms,"OK"))
         alarms = [ ]
         self.assertEquals(check_cloudwatch_alarms.OK, check_cloudwatch_alarms.check_status(alarms,"ERROR"))
-
-	
+        
+    def test_get_alarm_filter_expression(self):
+        class MockArgs:
+            alarmFilterExpressionEncoded = None
+            alarmFilterExpression = None
+            def __init__(self, alarmFilterExpression, alarmFilterExpressionEncoded):
+                self.alarmFilterExpression = alarmFilterExpression
+                self.alarmFilterExpressionEncoded = alarmFilterExpressionEncoded
+        expression = r'\bsky-cw\b | \bstaging\b'        
+        exprEncoded = base64.b64encode(expression)
+        # encoded: XGJza3ktY3dcYiB8IFxic3RhZ2luZ1xi
+        args = MockArgs(None,exprEncoded)
+        self.assertEquals(expression, check_cloudwatch_alarms.get_alarm_filter_expression(args))
+        args = MockArgs(expression, None)
+        self.assertEquals(expression, check_cloudwatch_alarms.get_alarm_filter_expression(args))

@@ -17,6 +17,7 @@ from wsgiref.validate import check_status
 import code
 import re
 import logging
+import base64
 
 ################################################################
 client = None
@@ -43,6 +44,9 @@ def main(argv):
     parser.add_argument('--alarmfilterexpression',dest='alarmFilterExpression', 
                         help='Expression for filter the alarms (python syntax)')
 
+    parser.add_argument('--alarmfilterexpressionenc',dest='alarmFilterExpressionEncoded', 
+                        help='Expression for filter the alarms (python syntax), encoded in base64')
+
     parser.add_argument('--AWS_DEFAULT_REGION',dest='AWS_DEFAULT_REGION', 
                         help='AWS parameter: AWS_DEFAULT_REGION')
     parser.add_argument('--AWS_ACCESS_KEY_ID',dest='AWS_ACCESS_KEY_ID', 
@@ -52,8 +56,16 @@ def main(argv):
 
     args = parser.parse_args()
     set_aws_params(args)
-    code = do_checks(args.statevalue, args.alarmNames, args.alarmFilterExpression)
+    code = do_checks(args.statevalue, args.alarmNames, get_alarm_filter_expression(args))
     exit(code)
+    
+def get_alarm_filter_expression(args):
+    if args.alarmFilterExpression:
+        return args.alarmFilterExpression
+    if args.alarmFilterExpressionEncoded:
+        return base64.b64decode(args.alarmFilterExpressionEncoded)
+    return None
+
 
 def do_checks(statevalue, alarmNames, alarmFilterExpression):
     print alarmNames
