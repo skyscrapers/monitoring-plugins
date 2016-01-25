@@ -68,10 +68,12 @@ def get_alarm_filter_expression(args):
 
 
 def do_checks(statevalue, alarmNames, alarmFilterExpression):
-    print("Command do_checks:" + "\n")
-    print("stateValue: " + statevalue + "\n")
-    print("alarmNames: " + alarmNames + "\n")
-    print("alarmFilterExpression: " + alarmFilterExpression + "\n")
+    print("Command do_checks:")
+    print("stateValue: " + statevalue)
+    if alarmFilterExpression:
+        print("alarmFilterExpression: " + alarmFilterExpression)
+    if alarmNames:
+        print("alarmNames: " + alarmNames)
 
     client = get_client()    
     alarms = get_alarms(client, statevalue, alarmNames)
