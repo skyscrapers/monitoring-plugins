@@ -68,7 +68,11 @@ def get_alarm_filter_expression(args):
 
 
 def do_checks(statevalue, alarmNames, alarmFilterExpression):
-    print alarmNames
+    print("Command do_checks:" + "\n")
+    print("stateValue: " + statevalue + "\n")
+    print("alarmNames: " + alarmNames + "\n")
+    print("alarmFilterExpression: " + alarmFilterExpression + "\n")
+
     client = get_client()    
     alarms = get_alarms(client, statevalue, alarmNames)
     alarms = filter_alarms(alarms, alarmFilterExpression)
@@ -98,14 +102,12 @@ def get_alarms(client, stateValue, alarmNames):
     
 def filter_alarms(alarms, alarmFilterExpression=None):
     if alarmFilterExpression is None:
-		return alarms
+        return alarms
     else:
-	alarmsFiltered = []
+        alarmsFiltered = []
         for alarm in alarms:
-            print (alarm.name)
             r = re.compile(alarmFilterExpression, flags=re.I | re.X)
             match = r.match(alarm.name)
-            print match
             if match:                      
                 alarmsFiltered.append(alarm)
         return alarmsFiltered
