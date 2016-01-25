@@ -130,8 +130,8 @@ def check_status(alarms, stateValue, nonCritical=False):
                 else:
                     code = CRITICAL
             elif stateValue == "INSUFFICIENT_DATA":
-                output += "WARNING - " + alarm.state_value + " - in cloudwatch\n"
-                code = WARNING
+                output += "CRITICAL - " + alarm.state_value + " - in cloudwatch\n"
+                code = CRITICAL
             elif stateValue == "OK":
                 output += "WARNING - " + alarm.state_value + " - in cloudwatch\n"
                 code = WARNING

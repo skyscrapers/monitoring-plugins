@@ -52,14 +52,14 @@ class TestCheckCloudWatchAlarms(BaseTestCase):
             def __init__(self, alarmFilterExpression, alarmFilterExpressionEncoded):
                 self.alarmFilterExpression = alarmFilterExpression
                 self.alarmFilterExpressionEncoded = alarmFilterExpressionEncoded
-        expression = "r'\bsky-cw\b | \bstaging\b'"        
+        expression = "sky-cw.*staging"        
         exprEncoded = base64.b64encode(expression)
         print("expr staging:" + expression)
         print("exprEncoded staging:" + exprEncoded)
-        print("expr production:" + "r'\bsky-cw\b | \bproduction\b'")
-        print("exprEncoded production:" + base64.b64encode("r'\bsky-cw\b | \bproduction\b'"))
-        #exprEncoded staging:cicIc2t5LWN3CCB8IAhzdGFnaW5nCCc=
-        #exprEncoded production:cicIc2t5LWN3CCB8IAhwcm9kdWN0aW9uCCc=
+        print("expr production:" + "sky-cw.*production")
+        print("exprEncoded production:" + base64.b64encode("sky-cw.*production"))
+        #exprEncoded staging:c2t5LWN3LipzdGFnaW5n
+        #exprEncoded production:c2t5LWN3Lipwcm9kdWN0aW9u
         
         args = MockArgs(None,exprEncoded)
         self.assertEquals(expression, check_cloudwatch_alarms.get_alarm_filter_expression(args))
