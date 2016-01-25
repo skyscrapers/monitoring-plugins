@@ -19,7 +19,8 @@ class TestCheckCloudWatchAlarms(BaseTestCase):
         class MockAlarm:
             def __init__(self, name):
                 self.name = name
-        filter1 = r'\bsky-cw\b | \bstaging\b'
+        filter1 ='sky-cw.*staging'
+        filter2 ='sky-cw.*production'
         alarms = [MockAlarm('sky-cw-addapp-ecs-staging-01')]
         self.assertEquals(1, len(check_cloudwatch_alarms.filter_alarms(alarms)))
         self.assertEquals(1, len(check_cloudwatch_alarms.filter_alarms(alarms, filter1)))
@@ -27,6 +28,9 @@ class TestCheckCloudWatchAlarms(BaseTestCase):
         self.assertEquals(1, len(check_cloudwatch_alarms.filter_alarms(alarms, filter1)))
         alarms.append(MockAlarm('sky-cw-text-addapp-ecs-staging-02'))
         self.assertEquals(2, len(check_cloudwatch_alarms.filter_alarms(alarms, filter1)))
+        alarms.append(MockAlarm('sky-cw-text-addapp-ecs-production-02'))
+        self.assertEquals(2, len(check_cloudwatch_alarms.filter_alarms(alarms, filter1)))
+        self.assertEquals(1, len(check_cloudwatch_alarms.filter_alarms(alarms, filter2)))
         
     def test_check_status(self):
         
@@ -48,9 +52,15 @@ class TestCheckCloudWatchAlarms(BaseTestCase):
             def __init__(self, alarmFilterExpression, alarmFilterExpressionEncoded):
                 self.alarmFilterExpression = alarmFilterExpression
                 self.alarmFilterExpressionEncoded = alarmFilterExpressionEncoded
-        expression = r'\bsky-cw\b | \bstaging\b'        
+        expression = "r'\bsky-cw\b | \bstaging\b'"        
         exprEncoded = base64.b64encode(expression)
-        # encoded: XGJza3ktY3dcYiB8IFxic3RhZ2luZ1xi
+        print("expr staging:" + expression)
+        print("exprEncoded staging:" + exprEncoded)
+        print("expr production:" + "r'\bsky-cw\b | \bproduction\b'")
+        print("exprEncoded production:" + base64.b64encode("r'\bsky-cw\b | \bproduction\b'"))
+        #exprEncoded staging:cicIc2t5LWN3CCB8IAhzdGFnaW5nCCc=
+        #exprEncoded production:cicIc2t5LWN3CCB8IAhwcm9kdWN0aW9uCCc=
+        
         args = MockArgs(None,exprEncoded)
         self.assertEquals(expression, check_cloudwatch_alarms.get_alarm_filter_expression(args))
         args = MockArgs(expression, None)
