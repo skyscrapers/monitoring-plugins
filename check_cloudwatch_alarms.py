@@ -68,12 +68,12 @@ def get_alarm_filter_expression(args):
 
 
 def do_checks(statevalue, alarmNames, alarmFilterExpression):
-    print("Command do_checks:")
-    print("stateValue: " + statevalue)
-    if alarmFilterExpression:
-        print("alarmFilterExpression: " + alarmFilterExpression)
-    if alarmNames:
-        print("alarmNames: " + alarmNames)
+    #print("Command do_checks:")
+    #print("stateValue: " + statevalue)
+    #if alarmFilterExpression:
+    #    print("alarmFilterExpression: " + alarmFilterExpression)
+    #if alarmNames:
+    #    print("alarmNames: " + alarmNames)
 
     client = get_client()    
     alarms = get_alarms(client, statevalue, alarmNames)
@@ -108,7 +108,7 @@ def filter_alarms(alarms, alarmFilterExpression=None):
     else:
         alarmsFiltered = []
         for alarm in alarms:
-            r = re.compile(alarmFilterExpression, flags=re.I | re.X)
+            r = re.compile(alarmFilterExpression)
             match = r.match(alarm.name)
             if match:                      
                 alarmsFiltered.append(alarm)
@@ -138,30 +138,30 @@ def check_status(alarms, stateValue, nonCritical=False):
             else:
                 output += "WARNING - " + alarm.state_value + " - in cloudwatch\n"
                 code = UNKNOWN
-            output += "  alarm.name=" + alarm.name + "\n"
-            output += "  alarm.alarm_description=" + str(alarm.alarm_description) + "\n"
-            output += "  alarm.state_value=" + str(alarm.state_value) + "\n"
-            output += "  alarm.state_reason=" + str(alarm.state_reason) + "\n"
-            output += "  alarm.state_reason_data=" + str(alarm.state_reason_data) + "\n"
-            output += "  alarm.state_updated_timestamp=" + str(alarm.state_updated_timestamp) + "\n"
-            output += "  alarm.actions_enabled=" + str(alarm.actions_enabled) + "\n"
-            output += "  alarm.alarm_actions=" + str(alarm.alarm_actions) + "\n"
-            output += "  alarm.alarm_arn=" + alarm.alarm_arn + "\n"
-            output += "  alarm.alarm_configuration_updated_timestamp=" + str(alarm.alarm_configuration_updated_timestamp) + "\n"
-            output += "  alarm.comparison_operator=" + str(alarm.comparison_operator) + "\n"
-            output += "  alarm.dimensions=" + str(alarm.dimensions) + "\n"
-            output += "  alarm.evaluation_periods=" + str(alarm.evaluation_periods) + "\n"
-            output += "  alarm.insufficient_data_actions=" + str(alarm.insufficient_data_actions) + "\n"
-            output += "  alarm.metric_name=" + str(alarm.metric_name) + "\n"
-            output += "  alarm.namespace=" + str(alarm.namespace) + "\n"
-            output += "  alarm.ok_actions=" + str(alarm.ok_actions) + "\n"
-            output += "  alarm.period=" + str(alarm.period) + "\n"
-            output += "  alarm.statistic=" + str(alarm.statistic) + "\n"
-            output += "  alarm.threshold=" + str(alarm.threshold) + "\n"
-            output += "  alarm.namealarm.unit=" + str(alarm.unit) + "\n"
+            output += "  ALARM NAME:" + alarm.name + "\n"
+            output += "  ALARM DESCRIPTION:" + str(alarm.alarm_description) + "\n"
+            #output += "  alarm.state_value=" + str(alarm.state_value) + "\n"
+            #output += "  alarm.state_reason=" + str(alarm.state_reason) + "\n"
+            #output += "  alarm.state_reason_data=" + str(alarm.state_reason_data) + "\n"
+            #output += "  alarm.state_updated_timestamp=" + str(alarm.state_updated_timestamp) + "\n"
+            #output += "  alarm.actions_enabled=" + str(alarm.actions_enabled) + "\n"
+            #output += "  alarm.alarm_actions=" + str(alarm.alarm_actions) + "\n"
+            #output += "  alarm.alarm_arn=" + alarm.alarm_arn + "\n"
+            #output += "  alarm.alarm_configuration_updated_timestamp=" + str(alarm.alarm_configuration_updated_timestamp) + "\n"
+            #output += "  alarm.comparison_operator=" + str(alarm.comparison_operator) + "\n"
+            #output += "  alarm.dimensions=" + str(alarm.dimensions) + "\n"
+            #output += "  alarm.evaluation_periods=" + str(alarm.evaluation_periods) + "\n"
+            #output += "  alarm.insufficient_data_actions=" + str(alarm.insufficient_data_actions) + "\n"
+            #output += "  alarm.metric_name=" + str(alarm.metric_name) + "\n"
+            #output += "  alarm.namespace=" + str(alarm.namespace) + "\n"
+            #output += "  alarm.ok_actions=" + str(alarm.ok_actions) + "\n"
+            #output += "  alarm.period=" + str(alarm.period) + "\n"
+            #output += "  alarm.statistic=" + str(alarm.statistic) + "\n"
+            #output += "  alarm.threshold=" + str(alarm.threshold) + "\n"
+            #output += "  alarm.namealarm.unit=" + str(alarm.unit) + "\n"
             countAlarms += 1
-        if countAlarms > 0:
-            print ("Found " + str(countAlarms) + " alarms found for State - " +stateValue + " - in cloudwatch\n")
+        if countAlarms > 1:
+            print ("Found " + str(countAlarms) + " alarms found for State - " +stateValue + " - in CLOUDWATCH\n")
 
     print (output)
     return code
