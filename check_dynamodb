@@ -174,8 +174,7 @@ def main():
                                   freq=pd.DateOffset(
                                       minutes=args.period/60))).interpolate(
                                           limit=args.timedelta/(
-                                              args.period/60),
-                                          limit_direction='both')
+                                              args.period/60))
 
     if args.debug:
         print("Data collected:")
