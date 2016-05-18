@@ -44,6 +44,7 @@ Run the test
 - check_couchdb
 - check_couchbase.py
 - check_couchbase_buckets.py (https://github.com/ebruAkagunduz/nagios-plugin-couchbase)
+- check_cpu_stats.sh (https://exchange.nagios.org/directory/Plugins/System-Metrics/CPU-Usage-and-Load/check_cpu_stats-2Esh/details)
 - check_dir
 - check_elasticsearch
 - check_elasticsearch_snapshot.py
@@ -68,6 +69,7 @@ Run the test
 - check_shorewall
 - check_shorewall6
 - check_ssl_certificate
+- check_ssllabs.pl (https://www.unixadm.org/nagios/check_sslscan)
 - check_succes_bacula
 - check_supervisorctl.sh
 - check_users.py
