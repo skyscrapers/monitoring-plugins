@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 # ==============================================================================
 # CPU Utilization Statistics plugin for Nagios
 #
@@ -163,10 +163,15 @@ done
 
 
 # List to Table for warning threshold (compatibility with
-set +A TAB_WARNING_THRESHOLD `echo $LIST_WARNING_THRESHOLD | sed 's/,/ /g'`
+#set +A TAB_WARNING_THRESHOLD `echo $LIST_WARNING_THRESHOLD | sed 's/,/ /g'`
+#if [ "${#TAB_WARNING_THRESHOLD[@]}" -ne "4" ]; then
+#  echo "ERROR : Bad count parameter in Warning Threshold"
+#  exit $STATE_WARNING
+#else
+TAB_WARNING_THRESHOLD=(`echo $LIST_WARNING_THRESHOLD | sed 's/,/ /g'`)
 if [ "${#TAB_WARNING_THRESHOLD[@]}" -ne "4" ]; then
-  echo "ERROR : Bad count parameter in Warning Threshold"
-  exit $STATE_WARNING
+echo "ERROR : Bad count parameter in Warning Threshold"
+exit $STATE_WARNING
 else
 USER_WARNING_THRESHOLD=`echo ${TAB_WARNING_THRESHOLD[0]}`
 SYSTEM_WARNING_THRESHOLD=`echo ${TAB_WARNING_THRESHOLD[1]}`
@@ -176,10 +181,14 @@ CPU_STEAL_THRESHOLD=`echo ${TAB_WARNING_THRESHOLD[3]}`
 fi
 
 # List to Table for critical threshold
-set +A TAB_CRITICAL_THRESHOLD `echo $LIST_CRITICAL_THRESHOLD | sed 's/,/ /g'`
+#set +A TAB_CRITICAL_THRESHOLD `echo $LIST_CRITICAL_THRESHOLD | sed 's/,/ /g'`
+#if [ "${#TAB_CRITICAL_THRESHOLD[@]}" -ne "3" ]; then
+#  echo "ERROR : Bad count parameter in CRITICAL Threshold"
+#  exit $STATE_WARNING
+TAB_CRITICAL_THRESHOLD=( `echo $LIST_CRITICAL_THRESHOLD | sed 's/,/ /g'` )
 if [ "${#TAB_CRITICAL_THRESHOLD[@]}" -ne "3" ]; then
-  echo "ERROR : Bad count parameter in CRITICAL Threshold"
-  exit $STATE_WARNING
+echo "ERROR : Bad count parameter in Critical Threshold"
+exit $STATE_CRITICAL
 else
 USER_CRITICAL_THRESHOLD=`echo ${TAB_CRITICAL_THRESHOLD[0]}`
 SYSTEM_CRITICAL_THRESHOLD=`echo ${TAB_CRITICAL_THRESHOLD[1]}`
