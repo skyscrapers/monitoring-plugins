@@ -96,7 +96,7 @@ def main():
   args = argp.parse_args()
 
   unhealthy_range = nagiosplugin.Range('%d:%d' % (HEALTHY - 1, HEALTHY + 1))
-  slave_range = nagiosplugin.Range('%s:' % (args.slaves,))
+  slave_range = nagiosplugin.Range('%s' % (args.slaves,))
 
   check = nagiosplugin.Check(
               MesosMaster('http://%s:%d' % (args.host, int(args.port)), args.framework),
