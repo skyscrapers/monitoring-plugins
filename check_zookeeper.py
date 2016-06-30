@@ -17,7 +17,6 @@
 """ Check Zookeeper Cluster
 
 Generic monitoring script that could be used with multiple platforms (Ganglia, Nagios, Cacti).
-
 It requires ZooKeeper 3.4.0 or greater. The script needs the 'mntr' 4letter word 
 command (patch ZOOKEEPER-744) that was now commited to the trunk.
 The script also works with ZooKeeper 3.3.x but in a limited way.
