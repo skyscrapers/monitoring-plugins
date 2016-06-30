@@ -1,0 +1,18 @@
+sudo: false
+script: ./scripts/build.sh
+notifications:
+  email: false
+  slack:
+    on_success: always
+    on_failure: always
+    rooms:
+      - skyscrapers:2iktDiFB6Ypq2buR7ImK5mAx#bot_messages
+
+before_install:
+  - openssl aes-256-cbc -k $private_key
+    -in travis.key.enc -out ./travis.key -d
+deploy:
+  provider: script
+  script: ./deploy.sh
+  on:
+    branch: master
