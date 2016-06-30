@@ -10,9 +10,6 @@ notifications:
       - skyscrapers:2iktDiFB6Ypq2buR7ImK5mAx#bot_messages
 
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install python-pip
-  - sudo ./scripts/ci/install
   - openssl aes-256-cbc -k $private_key -in travis.key.enc -out ./travis.key -d
 
 install: gem install fpm
