@@ -10,7 +10,7 @@ notifications:
       - skyscrapers:2iktDiFB6Ypq2buR7ImK5mAx#bot_messages
 
 before_install:
-  - openssl aes-256-cbc -k $private_key -in scripts/travis.key.enc -out scripts/travis.key -d
+  - openssl aes-256-cbc -k $private_key -in travis.key.enc -out travis.key -d
 
 install: gem install fpm
 deploy:
