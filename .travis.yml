@@ -1,4 +1,5 @@
 sudo: true
+language: ruby
 script: ./scripts/build.sh
 notifications:
   email: false
@@ -11,9 +12,10 @@ notifications:
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install python-pip
-  - sudo gem install fpm
   - sudo ./scripts/ci/install
   - openssl aes-256-cbc -k $private_key -in travis.key.enc -out ./travis.key -d
+
+install: gem install fpm
 deploy:
   provider: script
   script: ./scripts/deploy.sh
