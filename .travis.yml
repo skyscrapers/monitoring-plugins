@@ -14,6 +14,7 @@ before_install:
 
 install: gem install fpm
 deploy:
+  skip_cleanup: true
   provider: script
   script: ./scripts/deploy.sh
   on:
