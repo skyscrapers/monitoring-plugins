@@ -9,10 +9,13 @@ notifications:
       - skyscrapers:2iktDiFB6Ypq2buR7ImK5mAx#bot_messages
 
 before_install:
-  - openssl aes-256-cbc -k $private_key
-    -in travis.key.enc -out ./travis.key -d
+  - sudo apt-get -qq update
+  - sudo apt-get install python-pip
+  - sudo gem install fpm
+  - sudo ./scripts/ci/install
+  - openssl aes-256-cbc -k $private_key -in travis.key.enc -out ./travis.key -d
 deploy:
   provider: script
-  script: ./deploy.sh
+  script: ./scripts/deploy.sh
   on:
     branch: master
