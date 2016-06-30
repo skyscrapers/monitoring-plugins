@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 script: ./scripts/build.sh
 notifications:
   email: false
