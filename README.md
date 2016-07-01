@@ -12,12 +12,15 @@ Monitoring (Nagios) plugins that Skyscrapers uses.
 In case of docker run it is only needed Docker.
 
 ## Usage
-
+If you want to test the build locally you can run the following commands:
 ```
 apt-get install ruby-dev
 gem install fpm
-./build.sh
+./scripts/build.sh
 ```
+
+Once you are happy with the packages you want to add change the version in scripts/build.sh and push the code.
+The code will be automatically build and pushed by travis-ci
 ### Usage with docker
 
 ```
