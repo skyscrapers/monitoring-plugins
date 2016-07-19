@@ -11,7 +11,7 @@ STRING=`head -n8 /dev/urandom| tr -dc 'a-zA-Z' | fold -w 25 | head -n1`
 
 if [ $# -eq "2" ]; then
 
-        CHECK=`cat /proc/mounts | grep $1`
+        CHECK=`awk '$2 == var' var=$1 /proc/mounts`
         MOUNTPOINT=`echo $CHECK | cut -d' ' -f2`
         MOUNTTYPE=`echo $CHECK | cut -d' ' -f3`
 
