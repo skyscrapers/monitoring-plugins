@@ -61,10 +61,10 @@ date=$(date '+%Y%m%d')
 host="localhost"
 port="7199"
 
-#PROGNAME=`basename $0`
+PROGPATH=`basename $0`
 #PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
 #REVISION=`echo '$Revision: 1749 $' | sed -e 's/[^0-9.]//g'`
-. /usr/local/nagios/libexec/utils.sh
+. $PROGPATH/utils.sh
 
 # option definitions
 while getopts "c:w:H:P:hV" opt ; do
