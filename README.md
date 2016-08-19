@@ -42,6 +42,8 @@ Run the test
 - check_apachestatus_auto.pl
 - check_autoscalegroup.py
 - check_awsLaunchconf.py
+- check_cassandra.pl
+- check_cassandra_cluster.sh
 - check_clamscansites
 - check_cloudwatch.py
 - check_couchdb
