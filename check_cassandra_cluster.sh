@@ -61,7 +61,7 @@ date=$(date '+%Y%m%d')
 host="localhost"
 port="7199"
 
-PROGPATH=`basename $0`
+PROGPATH=`dirname $0`
 #PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
 #REVISION=`echo '$Revision: 1749 $' | sed -e 's/[^0-9.]//g'`
 . $PROGPATH/utils.sh
