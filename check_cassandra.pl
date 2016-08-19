@@ -50,7 +50,7 @@ my %result_rank        = (
 );
 
 my $host                = '127.0.0.1';
-my $nodetool_path       = '/usr/share/cassandra/bin/nodetool';
+my $nodetool_path       = '/usr/bin/nodetool';
 my $nodetool_opts       = '2>&1';
 
 check_cassandra_status();
@@ -59,7 +59,7 @@ exit $result_rank{$result};
 
 sub check_cassandra_status {
     my $heap_usage      = 0;
-    
+
     if ( !-x $nodetool_path ) {
         mydie( sprintf $messages{'node_tool_error'}, $nodetool_path );
     }
