@@ -28,22 +28,22 @@ exit 3
 check_status() {
 case $retval in
   0 )
-  echo "OK - Live Node:$live_node - ${verbose[*]} | ${performance[*]}"
+  echo "OK - Live Node:$live_node"
   exit 0
   ;;
 
   1 )
-  echo "WARNING - Live Node:$live_node - ${verbose[*]} | ${performance[*]}"
+  echo "WARNING - Live Node:$live_node"
   exit 1
   ;;
 
   2 )
-  echo "CRITICAL - Live Node:$live_node - ${verbose[*]} | ${performance[*]}"
+  echo "CRITICAL - Live Node:$live_node"
   exit 2
   ;;
 
   3 )
-  echo "UNKNOWN - Live Node:$live_node - ${verbose[*]} | ${performance[*]}"
+  echo "UNKNOWN - Live Node:$live_node"
   exit 3
   ;;
 
@@ -61,10 +61,10 @@ date=$(date '+%Y%m%d')
 host="localhost"
 port="7199"
 
-#PROGNAME=`basename $0`
+PROGPATH=`dirname $0`
 #PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
 #REVISION=`echo '$Revision: 1749 $' | sed -e 's/[^0-9.]//g'`
-. /usr/local/nagios/libexec/utils.sh
+. $PROGPATH/utils.sh
 
 # option definitions
 while getopts "c:w:H:P:hV" opt ; do
@@ -119,8 +119,8 @@ else
 fi
 
 # verify warning is less than critical
-if [ "$warning " -lt "$critical" ]; then
-  echo "-w <warning> $warning must be less than -c <critical> $critical."
+if [ "$warning" -lt "$critical" ]; then
+  echo "-w <warning> $warning must not be less than -c <critical> $critical."
   exit 3
 fi
 
@@ -128,10 +128,8 @@ fi
 # ------------------------------------------------------------
 # begin script
 # ------------------------------------------------------------
-# check the number of live node, status and performance
-live_node=$(nodetool -h $host -p $port ring | grep -c 'Up')
-verbose=($(nodetool -h $host -p $port ring | awk '/Up/ {print $1":"$4","$5","$6$7","$8 " " }'))
-performance=($(nodetool -h $host -p $port ring | awk '/Up/ {print "Load_"$1"="$6$7,"Owns_"$1"="$8}'))
+# check the number of live node
+live_node=$(nodetool -h $host -p $port ring | awk '$3 == "Up" { print $1 }' | sort | uniq | wc -l)
 
 # unless live node is number, reply unknown code
 expr $live_node + 1 >/dev/null 2>&1
