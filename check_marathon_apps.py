@@ -17,6 +17,7 @@ parser.add_argument('-w','--warn',help='% of unhealthy app and unmonitored apps 
 parser.add_argument('-c','--crit',help='% of unhealthy app and unmonitored apps that is considered critical', default="30,60")
 parser.add_argument('-a','--app_list',help='List of apps to be monitored comma separated')
 
+app_list = None
 args = parser.parse_args()
 if args.app_list:
     app_list=args.app_list.replace(" ","").split(",")
