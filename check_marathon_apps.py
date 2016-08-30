@@ -13,16 +13,16 @@ status={"crit":2,"warn":1,"ok":0}
 parser = argparse.ArgumentParser(description='This is a demo script by nixCraft.')
 parser.add_argument('-H','--host', help='Marathon hostname', default="10.0.10.11")
 parser.add_argument('-p','--port',help='Output file name', default="8080")
-parser.add_argument('-w','--warn',help='% of unhealthy app that is considered a warning', default=20)
-parser.add_argument('-c','--crit',help='% of unhealthy app that is considered critical', default=30)
+parser.add_argument('-w','--warn',help='% of unhealthy app and unmonitored apps that is considered a warning', default="20,30")
+parser.add_argument('-c','--crit',help='% of unhealthy app and unmonitored apps that is considered critical', default="30,60")
 parser.add_argument('-a','--app_list',help='List of apps to be monitored comma separated')
-parser.add_argument('-W','--unmonit_warn',help='% of app without healthchecks with less task than desired running considered a warning',default=30)
-parser.add_argument('-C','--unmonit_crit',help='% of app without healthchecks with less task than desired running considered critical',default=60)
 
 args = parser.parse_args()
 if args.app_list:
     app_list=args.app_list.replace(" ","").split(",")
-    
+
+crit,unmonit_crit=args.crit.split(",")
+warn,unmonit_warn=args.crit.split(",")
 url="http://"+args.host+":"+args.port+"/v2/apps?embed=apps.counts"
 r=requests.get(url)
 curr_status = 0
@@ -41,18 +41,18 @@ else:
             xcent_unhealthy=(float(app["tasksUnhealthy"]/float(app["instances"]))*100)
             msg += "app %s has %s unhealthy tasks; " % (app["id"], app["tasksUnhealthy"])
             if curr_status<status["crit"]:
-                if xcent_unhealthy >= args.crit:
+                if xcent_unhealthy >= int(crit):
                     curr_status = status["crit"]
-                elif xcent_unhealthy >= args.warn:
+                elif xcent_unhealthy >= int(warn):
                     curr_status = status["warn"]
 
         elif app['tasksHealthy'] is 0 and app['instances'] > app['tasksRunning']:
             msg += "app %s has less tasks running than expected: desired %s, current %s ; " % (app["id"],app['instances'], app['tasksRunning'])
             xcent_unhealthy=(float(app['instances'])- float(app['tasksRunning']))/float(app["instances"])*100
             if curr_status<status["crit"]:
-                if xcent_unhealthy >= args.unmonit_crit:
+                if xcent_unhealthy >= int(unmonit_crit):
                     curr_status = status["crit"]
-                elif xcent_unhealthy >= args.unmonit_warn:
+                elif xcent_unhealthy >= int(unmonit_warn):
                     curr_status = status["warn"]
 
 if curr_status is status["crit"]:
