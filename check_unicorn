@@ -17,7 +17,7 @@ E_BADARGS=65
 
 if [ $# -ne $EXPECTED_ARGS ]
 then
-    echo "Usage: `basename $0` [number of workers expected]"
+    echo "Usage: `basename $0` [number of workers minimum] [number of workers maximum]"
     exit ${UNKNOWN_STATE}
     exit $E_BADARGS
 fi
@@ -33,7 +33,7 @@ if [[ "$count_master" -eq 1 ]]; then
                 echo "OK - $count_workers unicorn workers running"
                 exit ${OK_STATE}
         else
-                if [[ "$count_workers" -gt "$1" ]]; then
+                if [[ "$count_workers" -gt "$2" ]]; then
                         echo "WARNING - Too many unicorn workers ($count_workers) running."
                         exit ${WARNING_STATE}
                 elif [[ "$count_workers" -lt $1 ]]; then
