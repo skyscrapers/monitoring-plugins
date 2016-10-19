@@ -37,6 +37,9 @@ if [[ "$count_master" -eq 1 ]]; then
                 elif [[ "$count_workers" -lt $1 ]]; then
                         echo "CRITICAL - only $count_workers unicorn workers are running !"
                         exit ${CRITICAL_STATE}
+                else
+                        echo "OK - $count_workers unicorn workers running"
+                        exit ${OK_STATE}
                 fi
         fi
 elif [[ "$count_master" -gt 1 ]]; then
