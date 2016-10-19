@@ -12,14 +12,12 @@ OK_STATE=0
 WARNING_STATE=1
 CRITICAL_STATE=2
 UNKNOWN_STATE=3
-EXPECTED_ARGS=1
-E_BADARGS=65
+EXPECTED_ARGS=2
 
 if [ $# -ne $EXPECTED_ARGS ]
 then
     echo "Usage: `basename $0` [number of workers minimum] [number of workers maximum]"
     exit ${UNKNOWN_STATE}
-    exit $E_BADARGS
 fi
 
 check_master=`ps awx | egrep "(unicorn|unicorn_rails) master" | grep -v grep`
