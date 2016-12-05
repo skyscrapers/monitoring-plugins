@@ -8,6 +8,10 @@ import sys
 import time
 import os
 import argparse
+import re
+import subprocess
+from datetime import timedelta, datetime
+
 
 def main():
     parser = argparse.ArgumentParser(description='Nagios Duplicity status checker')
@@ -29,6 +33,20 @@ def main():
     args = parser.parse_args()
 
     okay = 0
+
+    s = subprocess.Popen(["ps", "axw"],stdout=subprocess.PIPE)
+    for x in s.stdout:
+        if re.search("duply", x):
+            pid = x.split(' ', 1)[0]
+            p = subprocess.Popen(["ps", "-o", "lstart=", pid],stdout=subprocess.PIPE)
+            for y in p.stdout:
+                start_time = datetime.strptime(y.strip(), '%a %b  %d %H:%M:%S %Y')
+                if start_time < datetime.utcnow() + timedelta(hours = -12):
+                    print "CRITICAL: duply is backing up for more than 12 hours"
+                    okay = 2
+                else:
+                    print "OK: duply is backing up"
+            sys.exit(okay)
 
     output , err = Popen(["sudo", "duply", args.profile, "status"], stdout=PIPE, stderr=PIPE , env={'HOME': '/root', 'PATH': os.environ['PATH']}).communicate()
 
