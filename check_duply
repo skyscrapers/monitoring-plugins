@@ -36,7 +36,7 @@ def main():
 
     s = subprocess.Popen(["ps", "axw"],stdout=subprocess.PIPE)
     for x in s.stdout:
-        if re.search("\/duply", x):
+        if re.search("duply_" + args.profile, x):
             pid = x.split(' ')[1]
             p = subprocess.Popen(["ps", "-o", "lstart=", pid],stdout=subprocess.PIPE)
             for y in p.stdout:
