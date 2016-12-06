@@ -36,8 +36,8 @@ def main():
 
     s = subprocess.Popen(["ps", "axw"],stdout=subprocess.PIPE)
     for x in s.stdout:
-        if re.search("duply", x):
-            pid = x.split(' ', 1)[0]
+        if re.search("\/duply", x):
+            pid = x.split(' ')[1]
             p = subprocess.Popen(["ps", "-o", "lstart=", pid],stdout=subprocess.PIPE)
             for y in p.stdout:
                 start_time = datetime.strptime(y.strip(), '%a %b  %d %H:%M:%S %Y')
