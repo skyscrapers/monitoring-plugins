@@ -8,6 +8,7 @@ from operator import itemgetter
 import requests
 import sys
 import tempfile
+import base64
 
 # Nagios status codes
 OK, WARNING, CRITICAL, UNKNOWN = range(4)
@@ -18,7 +19,7 @@ def main(host, replicator, auth, age_timeout):
     }
 
     if auth:
-        headers['Authorization'] = 'Basic %s' % auth.encode('base64')
+        headers['Authorization'] = 'Basic %s' % base64.b64encode(auth)
 
     # Query the server and parse into objects
     try:
