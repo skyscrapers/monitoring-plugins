@@ -6,9 +6,21 @@
 #
 # CONFIG
 #
-PATH_CLIENTPID=/var/run/puppet/agent.pid
-PATH_MASTERPID=/var/run/puppet/master.pid
-PATH_STATE=/var/lib/puppet/state/state.yaml
+if [ -d "/var/run/puppetlabs" ]; then
+  PUPPET_RUN_PATH=/var/run/puppetlabs
+else
+  PUPPET_RUN_PATH=/var/run/puppet
+fi
+
+if [ -d "/opt/puppetlabs/puppet/cache/state" ]; then
+  PUPPET_STATE_PATH=/opt/puppetlabs/puppet/cache/state
+else
+  PUPPET_STATE_PATH=/var/lib/puppet/state
+fi
+
+PATH_CLIENTPID=$PUPPET_RUN_PATH/agent.pid
+PATH_MASTERPID=$PUPPET_RUN_PATH/master.pid
+PATH_STATE=$PUPPET_STATE_PATH/state.yaml
 WARNING=7200
 CRITICAL=10800
 
