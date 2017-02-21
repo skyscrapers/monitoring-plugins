@@ -57,10 +57,10 @@ function check_supervisor(){
 	check_command=$(sudo supervisorctl status | egrep '(STOPPED)|(STARTING)|(BACKOFF)|(STOPPING)|(EXITED)|(FATAL)|(UNKNOWN)' | wc -l)
 	if (( $check_command != 0 )); then
 		echo "One or more of your programs are not running!"
-		exit $STATE_CRITICAL
+		exit 2
 	else
 		echo "OK: All of your programs are running!"
-		exit $STATE_OK
+		exit 0
 	fi
 }
 
