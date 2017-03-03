@@ -50,6 +50,9 @@ print_help() {
     echo "  -o/--output-directory)"
     echo "     Specifies where to write the tmp-file that the check creates."
     echo "     Default is: /tmp"
+    echo "  -S/--status-page)"
+    echo "     Specifies the elasticsearch status page to check."
+    echo "     Default is: /_cluster/health"
     exit $ST_UK
 }
 
@@ -69,6 +72,10 @@ while test -n "$1"; do
             ;;
         --port|-P)
             port=$2
+            shift
+            ;;
+        --status-page|-S)
+            status_page=$2
             shift
             ;;
         --output-directory|-o)
