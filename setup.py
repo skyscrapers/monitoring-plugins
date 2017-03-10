@@ -28,7 +28,7 @@ if sys.version_info[0] == 2:
 
 setup(
     name='skymonitoringplugins',
-    version="1.3.1",
+    version="1.3.2",
     description='Skyscrapers monitoring tools',
     author='skyscrapers',
     scripts=[],

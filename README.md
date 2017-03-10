@@ -79,3 +79,4 @@ Run the test
 - check_supervisorctl.sh
 - check_users.py
 - check_glusterfs (https://exchange.nagios.org/directory/Plugins/System-Metrics/File-System/GlusterFS-checks/details)
+- check_keepalived_state(https://exchange.nagios.org/directory/Addons/Active-Checks/check_keepalived_state/details)
