@@ -141,16 +141,16 @@ last_entry=$(echo "$check_result" | tail -n1)
 
 # verify the number of journal entries is great than critical or warning
 if [ "$num_entries" -ge "$critical" ]; then
-  echo "CRITICAL - Matching entries: $num_entries"
+  echo "CRITICAL - Matching systemd journal entries: $num_entries"
   echo "Last matching entry: $last_entry"
   exit 2
 else
   if [ "$num_entries" -ge "$warning" ]; then
-    echo "WARNING - Matching entries: $num_entries"
+    echo "WARNING - Matching systemd journal entries: $num_entries"
     echo "Last matching entry: $last_entry"
     exit 1
   else
-    echo "OK - Matching entries: $num_entries"
+    echo "OK - Matching systemd journal entries: $num_entries"
     exit 0
   fi
 fi
