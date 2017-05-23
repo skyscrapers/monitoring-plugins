@@ -1,0 +1,156 @@
+#!/bin/bash
+#
+# Description: ....
+#
+# ------------------------------------------------------------
+# functions
+# ------------------------------------------------------------
+# print help
+usage() {
+  cat << EOF
+  Usage: $0 -u <unit> -p <priority> -m <match_pattern> -t <time_period> -w <warning> -c <critical>
+
+   -u <unit> Filter logs from the specified unit. All units by default.
+   -p <priority> Filter entries with the specified priority, that is a journald priority. All priorities by default.
+   -m <match_pattern> Filter entries with this pattern only, this is a regular expresion pattern accepted by grep. Off by default.
+   -t <time_period> Only filter journal entries since this time period until now, expressed in days. Everything by default.
+   -w <warning> alert warning state, if the number of matching journald entries is greater or equal than <warning>.
+   -c <critical> alert critical state, if the number of matching journald entries is greater or equal than <critical>.
+   -h show command options
+   -v show command version
+
+EOF
+  exit 3
+}
+
+# ------------------------------------------------------------
+# variables
+# ------------------------------------------------------------
+export LANG=C
+opt_v=1.00
+
+# option definitions
+while getopts "c:w:u:p:m:t:hv" opt ; do
+  case $opt in
+  c )
+  critical="$OPTARG"
+  ;;
+
+  w )
+  warning="$OPTARG"
+  ;;
+
+  u )
+  unit="$OPTARG"
+  ;;
+
+  p )
+  priority="$OPTARG"
+  ;;
+
+  m )
+  match_pattern="$OPTARG"
+  ;;
+
+  t )
+  time_period="$OPTARG"
+  ;;
+
+  h )
+  usage
+  ;;
+
+  v )
+  echo "`basename $0` $opt_v" ; exit 0
+  ;;
+
+  * )
+  usage
+  ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# verify warning and critical are number
+expr $warning + 1 >/dev/null 2>&1
+if [ "$?" -lt 2 ]; then
+  true
+else
+  echo "-c <critical> $critical must be number."
+  exit 3
+fi
+
+expr $critical + 1 >/dev/null 2>&1
+if [ "$?" -lt 2 ]; then
+  true
+else
+  echo "-c <critical> $critical must be number."
+  exit 3
+fi
+
+# error if warning is greater than critical
+if [ "$warning" -gt "$critical" ]; then
+  echo "-w <warning> $warning must not be greater than -c <critical> $critical."
+  exit 3
+fi
+
+
+# ------------------------------------------------------------
+# begin script
+# ------------------------------------------------------------
+check_command="journalctl"
+
+if [ ! -z "$unit" ]; then
+  check_command="$check_command -u $unit"
+fi
+
+if [ ! -z "$priority" ]; then
+  check_command="$check_command -p $priority"
+fi
+
+if [ ! -z "$time_period" ]; then
+  check_command="$check_command -S \"$time_period hours ago\""
+fi
+
+if [ ! -z "$match_pattern" ]; then
+  check_command="$check_command | grep -e $match_pattern"
+fi
+
+check_result=$(eval "$check_command; "'exit ${PIPESTATUS[0]}')
+if [ "$?" -gt 0 ]; then
+  echo "UNKNOWN - Error running journalctl"
+  exit 3
+fi
+
+if [ -z "$check_result" ]; then
+  num_entries=0
+else
+  num_entries=$(echo "$check_result" | wc -l)
+fi
+
+# unless num_entries is number, reply unknown code
+expr $num_entries + 1 >/dev/null 2>&1
+if [ "$?" -lt 2 ]; then
+  true
+else
+  echo "UNKNOWN - Something went wrong while counting the number of entries"
+  exit 3
+fi
+
+last_entry=$(echo "$check_result" | tail -n1)
+
+# verify the number of journal entries is great than critical or warning
+if [ "$num_entries" -ge "$critical" ]; then
+  echo "CRITICAL - Matching systemd journal entries: $num_entries"
+  echo "Last matching entry: $last_entry"
+  exit 2
+else
+  if [ "$num_entries" -ge "$warning" ]; then
+    echo "WARNING - Matching systemd journal entries: $num_entries"
+    echo "Last matching entry: $last_entry"
+    exit 1
+  else
+    echo "OK - Matching systemd journal entries: $num_entries"
+    exit 0
+  fi
+fi
