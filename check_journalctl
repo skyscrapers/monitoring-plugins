@@ -113,7 +113,7 @@ if [ ! -z "$time_period" ]; then
 fi
 
 if [ ! -z "$match_pattern" ]; then
-  check_command="$check_command | grep -e $match_pattern"
+  check_command="$check_command | grep -e \"$match_pattern\""
 fi
 
 check_result=$(eval "$check_command; "'exit ${PIPESTATUS[0]}')
