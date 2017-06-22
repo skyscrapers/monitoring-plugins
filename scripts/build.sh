@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=1.3.44
+VERSION=1.3.45
 
 rm -rf *.deb
 
