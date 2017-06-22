@@ -14,21 +14,21 @@ class RabbitCmdWrapper(object):
 
     @classmethod
     def list_connections(cls):
-        args = shlex.split("sudo rabbitmqctl list_connections")
+        args = shlex.split("sudo /usr/sbin/rabbitmqctl list_connections")
         cmd_result = subprocess.check_output(args).strip()
         results = cls._parse_list_results(cmd_result)
         return results
 
     @classmethod
     def list_queues(cls):
-        args = shlex.split('sudo rabbitmqctl list_queues')
+        args = shlex.split('sudo /usr/sbin/rabbitmqctl list_queues')
         cmd_result = subprocess.check_output(args).strip()
         results = cls._parse_list_results(cmd_result)
         return results
 
     @classmethod
     def status(cls):
-        args = shlex.split('sudo rabbitmqctl status')
+        args = shlex.split('sudo /usr/sbin/rabbitmqctl status')
         cmd_result = subprocess.check_output(args).strip()
         results = cls._parse_list_results(cmd_result)
         return results
@@ -71,8 +71,11 @@ def check_queues_count(critical=1000, warning=1000):
         warning_q = []
         ok_q = []
         results = RabbitCmdWrapper.list_queues()
-        for queue in results:
-            count = int(queue[1])
+	for queue in results:
+	    if len(queue) == 1:
+	    	continue
+
+	    count = int(queue[1])
             if count >= critical:
                 critical_q.append("%s: %s" % (queue[0], count))
             elif count >= warning:
