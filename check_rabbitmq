@@ -71,9 +71,9 @@ def check_queues_count(critical=1000, warning=1000):
         warning_q = []
         ok_q = []
         results = RabbitCmdWrapper.list_queues()
-	for queue in results:
-	    if len(queue) == 1:
-	    	continue
+        for queue in results:
+            if len(queue) == 1:
+                continue
 
 	    count = int(queue[1])
             if count >= critical:
