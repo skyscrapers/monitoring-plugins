@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+
+#
+# check_aws_ec2_backup - Nagios plugin for monitoring AWS EC2 EBS snapshot
+#                        creation via AWS CLI, written in shell.
+#
+# Released under the MIT License.
+#
+# https://github.com/tommarshall/nagios-check-aws-ec2-backup
+#
+
+VERSION=0.1.0
+OK=0
+WARNING=1
+CRITICAL=2
+UNKNOWN=3
+AWS_CLI_BIN_PATH='aws'
+WARNING_THRESHOLD=87300 # 24hrs 15mins
+CRITICAL_THRESHOLD=173700 # 48hrs 15mins
+
+#
+# Output version.
+#
+
+version() {
+  echo "check_aws_ec2_backup $VERSION"
+}
+
+#
+# Output usage information.
+#
+
+usage() {
+  echo 'Usage: ./check_aws_ec2_backup -r <region> -v <volume-id> [options]'
+}
+
+#
+# Output help information.
+#
+
+help() {
+  usage
+  cat <<-EOF
+
+  Examples:
+    ./check_aws_ec2_backup -r eu-west-1 -v vol-123abcd0
+
+    ./check_aws_ec2_backup -r eu-west-1 -v vol-123abcd0 -w 605700 -c 1210500
+
+    ./check_aws_ec2_backup -r eu-west-1 -v vol-123abcd0 -p foo-profile
+
+    ./check_aws_ec2_backup -r eu-west-1 -v vol-123abcd0 -a /usr/local/bin/aws
+
+  Options:
+    -r, --region <region>       AWS region to use
+    -v, --volume-id <volume-id> AWS volume ID to check
+    -p, --profile <profile>     AWS CLI config profile to use
+    -w, --warning <seconds>     snapshot age in seconds to treat as WARNING
+    -c, --critical <seconds>    snapshot age in seconds to treat as CRITICAL
+    -a, --aws-cli-path <path>   set path to AWS CLI, if not on $PATH
+    -V, --version               output version
+    -h, --help                  output help information
+
+  -c/--critical takes priority over -w/--warning.
+
+  For more information, see https://github.com/tommarshall/nagios-check-aws-ec2-backup
+
+EOF
+}
+
+#
+# Parse argv.
+#
+
+while test $# -ne 0; do
+  ARG=$1; shift
+  case $ARG in
+    -r|--region) REGION=$1; shift ;;
+    -v|--volume-id) VOLUME_ID=$1; shift ;;
+    -p|--profile) PROFILE=$1; shift ;;
+    -w|--warning) WARNING_THRESHOLD=$1; shift ;;
+    -c|--critical) CRITICAL_THRESHOLD=$1; shift ;;
+    -a|--aws-cli-path) AWS_CLI_BIN_PATH=$1; shift ;;
+    -V|--version) version; exit ;;
+    -h|--help) help; exit ;;
+    *)
+      echo "UNKNOWN: Unrecognised argument: $ARG"
+      usage >&2
+      exit $UNKNOWN
+      ;;
+  esac
+done
+
+#
+# Showtime.
+#
+
+# ensure we have aws cli
+if ! command -v $AWS_CLI_BIN_PATH > /dev/null; then
+  echo 'UNKNOWN: Unable to find AWS CLI'
+  exit $UNKNOWN
+fi
+
+# ensure we have GNU date
+if ! date --version >/dev/null 2>&1 ; then
+  if gdate --version >/dev/null 2>&1 ; then
+    date () { gdate "$@"; }
+  else
+    echo 'UNKNOWN: Unable to find GNU date'
+    exit $UNKNOWN
+  fi
+fi
+
+# set the profile argument, if we have one
+if [ -n "$PROFILE" ]; then
+  PROFILE_ARG="--profile ${PROFILE}"
+else
+  PROFILE_ARG=
+fi
+
+# ensure we have aws cli credentials
+AWS_CLI_CONFIG="$($AWS_CLI_BIN_PATH configure list $PROFILE_ARG 2>&1)"
+
+if echo "$AWS_CLI_CONFIG" | grep -qE 'access_key.*<not set>'; then
+  echo 'UNKNOWN: Unable to find AWS CLI access key'
+  exit $UNKNOWN
+fi
+
+if echo "$AWS_CLI_CONFIG" | grep -qE 'missing: AWS_SECRET_ACCESS_KEY'; then
+  echo 'UNKNOWN: Unable to find AWS CLI secret key'
+  exit $UNKNOWN
+fi
+
+# ensure we have a REGION
+if [ -z "$REGION" ]; then
+  echo 'UNKNOWN: --region/-r not set'
+  exit $UNKNOWN
+fi
+
+# ensure we have a VOLUME_ID
+if [ -z "$VOLUME_ID" ]; then
+  echo 'UNKNOWN: --volume-id/-v not set'
+  exit $UNKNOWN
+fi
+
+# fetch the most recent snapshot time for the volume ID
+SNAPSHOTS="$($AWS_CLI_BIN_PATH ec2 describe-snapshots $PROFILE_ARG --region $REGION --filters Name=volume-id,Values=$VOLUME_ID Name=status,Values=pending,completed --output text --query Snapshots[*].{Time:StartTime} 2>&1)"
+
+if [ $? -ne 0 ]; then
+  echo 'UNKNOWN: Unable to fetch snapshots via AWS CLI'
+  exit $UNKNOWN
+fi
+
+for SNAPSHOT_START_TIME in $SNAPSHOTS; do
+  if [ -z "$MOST_RECENT_SNAPSHOT_START_TIME" ]; then
+    MOST_RECENT_SNAPSHOT_START_TIME=$SNAPSHOT_START_TIME
+  fi
+  if [[ $SNAPSHOT_START_TIME > $MOST_RECENT_SNAPSHOT_START_TIME ]]; then
+    MOST_RECENT_SNAPSHOT_START_TIME=$SNAPSHOT_START_TIME
+  fi
+done
+
+#
+# report and exit
+#
+
+if [ -z "$MOST_RECENT_SNAPSHOT_START_TIME" ]; then
+  echo "CRITICAL: No snapshots found for volume-id '${VOLUME_ID}'"
+  exit $CRITICAL
+fi
+
+MOST_RECENT_SNAPSHOT_AGE="$(($(date -u +%s) - $(date -u -d $MOST_RECENT_SNAPSHOT_START_TIME +%s)))"
+
+if [ "$MOST_RECENT_SNAPSHOT_AGE" -gt "$CRITICAL_THRESHOLD" ]; then
+  echo "CRITICAL: Snapshot created $MOST_RECENT_SNAPSHOT_START_TIME"
+  exit $CRITICAL
+fi
+
+if [ "$MOST_RECENT_SNAPSHOT_AGE" -gt "$WARNING_THRESHOLD" ]; then
+  echo "WARNING: Snapshot created $MOST_RECENT_SNAPSHOT_START_TIME"
+  exit $WARNING
+fi
+
+echo "OK: Snapshot created $MOST_RECENT_SNAPSHOT_START_TIME"
+exit $OK
