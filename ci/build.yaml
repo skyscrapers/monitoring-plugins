@@ -1,0 +1,41 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: "ruby"
+    tag: "rc-alpine"
+
+
+inputs:
+  - name: git-plugins
+  - name: plugins-version
+outputs:
+  - name: outputs
+
+run:
+  path: sh
+  args:
+    - -c
+    - |
+      set -e
+      apk add --update alpine-sdk zip
+      gem install fpm
+      export VERSION=`cat plugins-version/version`
+      cd git-plugins
+      chmod 755 check_*
+      fpm -s dir -t deb -n skyscrapers-monitoring-plugins -v ${VERSION} -a all \
+        --description "Monitoring plugins that Skyscrapers uses" \
+        -x "**/.git/**" -x "**/README.md" -x "**/LICENSE" -x "**/.git" -x "**/build.sh" \
+        -x "**/build" -x "**/dist" -x "**/scripts" -x "**/tests" \
+        -x "**/skymonitoringplugins.egg-info" -x "**/.tox"\
+        -x "*build*.sh" \
+        -x "**/Docker*" \
+        -x "**/.project" \
+        -x "**/tox.ini" \
+        -x "**/circle*" \
+        -x "**/git*" \
+        -x "**/*.pyc" \
+        -x "**/*.py~" \
+        .=/usr/lib/nagios/plugins
+      tar -czf ../outputs/plugins.tar.gz skyscrapers-monitoring-plugins_*_all.deb      
