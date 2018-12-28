@@ -58,6 +58,8 @@ Run the test
 - check_file_ages_in_dirs
 - check_file_content.pl
 - check_freshclam
+- check_glusterfs (https://exchange.nagios.org/directory/Plugins/System-Metrics/File-System/GlusterFS-checks/details)
+- check_keepalived_state(https://exchange.nagios.org/directory/Addons/Active-Checks/check_keepalived_state/details)
 - check_md_raid
 - check_memory (https://exchange.icinga.org/exchange/check_linux_memory)
 - check_mount
@@ -78,5 +80,4 @@ Run the test
 - check_succes_bacula
 - check_supervisorctl.sh
 - check_users.py
-- check_glusterfs (https://exchange.nagios.org/directory/Plugins/System-Metrics/File-System/GlusterFS-checks/details)
-- check_keepalived_state(https://exchange.nagios.org/directory/Addons/Active-Checks/check_keepalived_state/details)
+- pmp-check-aws-rds.py (https://github.com/percona/percona-monitoring-plugins)
