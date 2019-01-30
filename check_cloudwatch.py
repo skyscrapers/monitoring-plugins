@@ -1,30 +1,40 @@
 #!/usr/bin/env python
 
-# Written by filip@skyscrape.rs
-# 2014-05-30
-
 import json
 import os
-import sys
-from pprint import pprint
-import commands
+import boto3
+import argparse
 
-paramList = sys.argv
-if len(paramList) <= 1:
-    print "USAGE " + paramList[0] + " <cloudwatch metric>"
-    sys.exit(2)
+OK=0
+WARNING=1
+CRITICAL=2
+UNKNOWN=3
 
-cwName = paramList[1]
+parser = argparse.ArgumentParser(description='Check cloud watch alarms.')
+parser.add_argument('--alarmnames', metavar='an', dest='alarmNames', nargs='*', help='Alarm names for filtering')
+parser.add_argument('--region', metavar='r', dest='region', help='AWS Region', default='eu-west-1' )
+args = parser.parse_args()
 
-cmd = "/usr/local/bin/aws --profile nagiosro cloudwatch describe-alarms --alarm-names " + cwName
-output = commands.getoutput(cmd)
+client = boto3.client('cloudwatch',region_name=args.region)
 
-jsondata = json.loads(output)
-
-for item in jsondata['MetricAlarms']:
-    if item['StateValue'] == 'OK':
-        print "OK - " + item['StateReason']
-        sys.exit(0)
+alarms = client.describe_alarms(AlarmNames=args.alarmNames)
+output = ""
+countAlarms=0
+code = 0
+for alarm in alarms["MetricAlarms"]:
+    if alarm["StateValue"] == "ERROR":
+        output += "CRITICAL - " + alarm["StateValue"] + " - in cloudwatch\n"
+        code = CRITICAL
+    elif alarm["StateValue"] in ["OK","INSUFFICIENT_DATA"] :
+        output += "OK - " + alarm["StateValue"] + " - in cloudwatch\n"
+        if code == 0: code = OK
     else:
-        print "CRITICAL - " + item['StateReason']
-        sys.exit(2)
+        output += "WARNING - " + alarm["StateValue"] + " - in cloudwatch\n"
+        if code != CRITICAL: code = UNKNOWN
+    output += "  ALARM NAME:" + alarm["AlarmName"] + "\n"
+    output += "  ALARM DESCRIPTION:" + str(alarm["AlarmDescription"]) + "\n"
+
+    countAlarms += 1
+
+print (output)
+exit(code)
