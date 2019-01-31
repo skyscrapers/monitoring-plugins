@@ -22,7 +22,7 @@ output = ""
 countAlarms=0
 code = 0
 for alarm in alarms["MetricAlarms"]:
-    if alarm["StateValue"] == "ERROR":
+    if alarm["StateValue"] == "ALARM":
         output += "CRITICAL - " + alarm["StateValue"] + " - in cloudwatch\n"
         code = CRITICAL
     elif alarm["StateValue"] in ["OK","INSUFFICIENT_DATA"] :
@@ -30,7 +30,7 @@ for alarm in alarms["MetricAlarms"]:
         if code == 0: code = OK
     else:
         output += "WARNING - " + alarm["StateValue"] + " - in cloudwatch\n"
-        if code != CRITICAL: code = UNKNOWN
+        if code != CRITICAL: code = WARNING
     output += "  ALARM NAME:" + alarm["AlarmName"] + "\n"
     output += "  ALARM DESCRIPTION:" + str(alarm["AlarmDescription"]) + "\n"
 
