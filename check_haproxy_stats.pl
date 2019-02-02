@@ -15,7 +15,7 @@
 # warranty of merchantability or fitness for a particular purpose.
 #
 
-our $VERSION = "1.1.1";
+our $VERSION = "1.1.3";
 
 open(STDERR, ">&STDOUT");
 
@@ -29,6 +29,7 @@ open(STDERR, ">&STDOUT");
 #   1.1.0   - support for HTTP interface
 #   1.1.1   - drop perl 5.10 requirement
 #   1.1.2   - add support for ignoring DRAIN state
+#   1.1.3   - add support ignoring hosts matching a regex
 
 use strict;
 use warnings;
@@ -68,6 +69,9 @@ DESCRIPTION
 
     -m, --ignore-maint
         Assume servers in MAINT state to be ok.
+
+    -i, --ignore-regex
+        Ignore servers that match the given regex.
 
     -n, --ignore-drain
         Assume servers in DRAIN state to be ok.
@@ -154,6 +158,7 @@ my $pass = '';
 my $dump;
 my $ignore_maint;
 my $ignore_drain;
+my $ignore_regex;
 my $proxy;
 my $no_proxy;
 my $help;
@@ -167,6 +172,7 @@ GetOptions (
     "m|ignore-maint"    => \$ignore_maint,
     "n|ignore-drain"    => \$ignore_drain,
     "p|proxy=s"         => \$proxy,
+    "i|ignore-regex=s"  => \$ignore_regex,
     "P|no-proxy=s"      => \$no_proxy,
     "s|sock|socket=s"   => \$sock,
     "U|url=s"           => \$url,
@@ -276,6 +282,7 @@ foreach (@hastats) {
 
     # Check of BACKENDS
     if ($data[$svname] eq 'BACKEND') {
+        next if ($data[$pxname] =~ ".*${ignore_regex}.*");
         if ($data[$status] ne 'UP') {
             $msg .= sprintf "BACKEND: %s is %s; ", $data[$pxname], $data[$status];
             $exitcode = 2;
@@ -291,6 +298,7 @@ foreach (@hastats) {
         if ($data[$status] ne 'UP') {
             next if ($ignore_maint && $data[$status] eq 'MAINT');
             next if ($ignore_drain && $data[$status] eq 'DRAIN');
+            next if ($data[$svname] =~ ".*${ignore_regex}.*");
             next if $data[$status] eq 'no check';   # Ignore server if no check is configured to be run
             next if $data[$svname] eq 'sock-1';
             $exitcode = 2;
