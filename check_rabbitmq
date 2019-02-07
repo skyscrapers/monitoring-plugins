@@ -39,6 +39,7 @@ class RabbitCmdWrapper(object):
         #remove text fluff
         if "Listing connections ..." in results: results.remove("Listing connections ...")
         if "Listing queues ..." in results: results.remove("Listing queues ...")
+        if "name\tmessages" in results: results.remove("name\tmessages")
         return_data = []
         for row in results:
             return_data.append(row.split('\t'))
