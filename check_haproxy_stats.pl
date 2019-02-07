@@ -282,7 +282,7 @@ foreach (@hastats) {
 
     # Check of BACKENDS
     if ($data[$svname] eq 'BACKEND') {
-        next if ($data[$pxname] =~ ".*${ignore_regex}.*");
+        next if ($ignore_regex && $data[$pxname] =~ ".*${ignore_regex}.*");
         if ($data[$status] ne 'UP') {
             $msg .= sprintf "BACKEND: %s is %s; ", $data[$pxname], $data[$status];
             $exitcode = 2;
@@ -298,7 +298,7 @@ foreach (@hastats) {
         if ($data[$status] ne 'UP') {
             next if ($ignore_maint && $data[$status] eq 'MAINT');
             next if ($ignore_drain && $data[$status] eq 'DRAIN');
-            next if ($data[$svname] =~ ".*${ignore_regex}.*");
+            next if ($ignore_regex && $data[$svname] =~ ".*${ignore_regex}.*");
             next if $data[$status] eq 'no check';   # Ignore server if no check is configured to be run
             next if $data[$svname] eq 'sock-1';
             $exitcode = 2;
