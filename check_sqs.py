@@ -194,7 +194,8 @@ def return_oldest_messages(oldest_messages):
 
     # Print final output for Nagios
     print status_msg + "|" + perfdata_msg
-
+    exit(exit_code)
+    
 if args.metric == 'queue_length':
     return_queue_length(q_list,depth_list)
 elif args.metric == 'oldest_message':
