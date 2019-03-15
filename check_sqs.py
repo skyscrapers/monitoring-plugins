@@ -114,11 +114,9 @@ for qname in rs:
             except:
                 return False
         while retries < 10 and not isfloat(str(queue_metric)):
-            print(queue_metric)
             retries = retries +1
             time.sleep(retries*10)
             queue_metric=get_oldest_message()
-        print(queue_metric)
         oldest_messages.append({"queue_name":namelist[2], "oldest_message": queue_metric, "queue_length": int(qname.count())})
 
 def return_queue_length(q_list,depth_list):
