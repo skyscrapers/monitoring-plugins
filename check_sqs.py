@@ -101,11 +101,25 @@ for qname in rs:
     if args.metric == 'queue_length':
         q_list.append(namelist[2])
         depth_list.append(int(qname.count()))
-
     elif args.metric == 'oldest_message':
         points = 5
-        queue_metric = get_metric(namelist[2],"ApproximateAgeOfOldestMessage",now - datetime.timedelta(seconds=points * 60), now, 60*points)
-        oldest_messages.append({"queue_name":namelist[2], "oldest_message": queue_metric})
+        retries = 0
+        def get_oldest_message():
+            return get_metric(namelist[2],"ApproximateAgeOfOldestMessage",now - datetime.timedelta(seconds=points * 60), now, 60*points)
+        queue_metric=get_oldest_message()
+        def isfloat(text):
+            try:
+                float(text)
+                return True
+            except:
+                return False
+        while retries < 10 and not isfloat(str(queue_metric)):
+            print(queue_metric)
+            retries = retries +1
+            time.sleep(retries*10)
+            queue_metric=get_oldest_message()
+        print(queue_metric)
+        oldest_messages.append({"queue_name":namelist[2], "oldest_message": queue_metric, "queue_length": int(qname.count())})
 
 def return_queue_length(q_list,depth_list):
     status_msg_list = []
@@ -195,7 +209,7 @@ def return_oldest_messages(oldest_messages):
     # Print final output for Nagios
     print status_msg + "|" + perfdata_msg
     exit(exit_code)
-    
+
 if args.metric == 'queue_length':
     return_queue_length(q_list,depth_list)
 elif args.metric == 'oldest_message':
