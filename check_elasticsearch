@@ -83,6 +83,10 @@ while test -n "$1"; do
             port=$2
             shift
             ;;
+        --protocol|-r)
+            protocol=$2
+            shift
+            ;;
         --password|-p)
             password=$2
             authentication=True
@@ -131,7 +135,7 @@ get_status() {
     filename=${PROGNAME}-${hostname}-${status_page}.1
     filename=`echo $filename | tr -d '\/'`
     filename=${output_dir}/${filename}
-    wget -q -t 3 -T 3 ${user} ${pass} http://${hostname}:${port}/${status_page}?pretty=true -O ${filename}
+    wget -q -t 3 -T 3 ${user} ${pass} ${protocol}://${hostname}:${port}/${status_page}?pretty=true -O ${filename}
 }
 
 get_vals() {
