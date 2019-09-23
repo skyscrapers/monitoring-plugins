@@ -6,6 +6,7 @@ import boto
 import boto.sqs
 import boto.ec2.cloudwatch
 import datetime
+import time
 
 def printUsage():
     print
