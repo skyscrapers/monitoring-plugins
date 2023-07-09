@@ -269,7 +269,7 @@ foreach (@hastats) {
 
     # Is session limit enforced?
     if ($data[$slim]) {
-        $perfdata .= sprintf "%s-%s=%u;%u;%u;0;%u;", $data[$pxname], $data[$svname], $data[$scur], $swarn * $data[$slim] / 100, $scrit * $data[$slim] / 100, $data[$slim];
+        $perfdata .= sprintf "%s-%s=%u;%u;%u;0;%u ", $data[$pxname], $data[$svname], $data[$scur], $swarn * $data[$slim] / 100, $scrit * $data[$slim] / 100, $data[$slim];
 
         # Check current session # against limit
         my $sratio = $data[$scur]/$data[$slim];
