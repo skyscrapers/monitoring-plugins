@@ -197,14 +197,9 @@ if ($url and $lwp) {
     $geturl .= ';csv';
     $haproxy = get($geturl);
 } elsif ($url) {
-    my $haproxyio;
     my $getcmd = "curl --insecure -s --fail "
                . "--user '$user:$pass' '".$url.";csv'";
-    open $haproxyio, "-|", $getcmd;
-    while (<$haproxyio>) {
-        $haproxy .= $_;
-    }
-    close($haproxyio);
+    $haproxy = `$getcmd`;
 } else {
     # Connect to haproxy socket and get stats
     my $haproxyio = new IO::Socket::UNIX (
