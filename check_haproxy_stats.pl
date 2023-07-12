@@ -251,6 +251,7 @@ my @no_proxies = split ',', $no_proxy if $no_proxy;
 my $exitcode = 0;
 my $msg;
 my $checked = 0;
+my %checked_proxies;
 my $perfdata = "";
 
 # Remove excluded proxies from the list if both -p and -P options are
@@ -266,6 +267,8 @@ foreach (@hastats) {
     my @data = split /,/, $_;
     if (@proxies) { next unless grep {$data[$pxname] eq $_} @proxies; };
     if (@no_proxies) { next if grep {$data[$pxname] eq $_} @no_proxies; };
+
+    $checked_proxies{$data[$pxname]} = "found";
 
     # Is session limit enforced?
     if ($data[$slim]) {
@@ -309,6 +312,11 @@ foreach (@hastats) {
         }
     }
     ++$checked;
+}
+
+if (@proxies && 0+@proxies > 0+keys %checked_proxies) {
+    $exitcode = 2;
+    $msg = "Not all proxies checked for @proxies.";
 }
 
 unless ($msg) {
